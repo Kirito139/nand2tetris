@@ -5,7 +5,7 @@ import sys
 
 inputfilename = sys.argv[1]
 outputfilename = inputfilename.rsplit('.', 1)[0] + '.hack'
-are = re.compile(r'^\s*@(.*)')
+are = re.compile(r'^\s*@([a-zA-Z0-9_.$]+)')
 # first part allows whitespace, second part allows 1-3 letters(the dest field),
 # after that an = sign, the comp field, the rest allows for a comment
 cre = re.compile(r'^\s*(?:(\w{0,3})=)?([0-9A-Z+\|&\-!]{1,3})(?:;(\w{0,3}))?')
@@ -42,7 +42,7 @@ compdict = {'0': '0101010',
             'M': '1110000',
             '!D': '1001101',
             '!A': '0110001',
-            'r!M': '1110001',
+            '!M': '1110001',
             '-D': '0001111',
             '-A': '0110011',
             '-M': '1110011',
@@ -113,24 +113,27 @@ def parser(line):
     m = are.match(line)
     if m:
         address = m.group(1)
-        output = '0'
         if adre.match(address):
+            output = '0'
             output += format(int(address), 'b')
+            filler = ''
+            for i in range(16-len(output)):
+                filler += '0'
+            filler += output
+            filler += '\n'
+            return filler
         elif address not in undefinedsymboltable:
-            undefinedsymboltable += address
-        filler = ''
-        for i in range(16-len(output)):
-            filler += '0'
-        filler += output
-        filler += '\n'
-        return filler
+            if address not in labelsymboltable:
+                if address not in addressymboltable:
+                    undefinedsymboltable.append(address)
+        return address
     m = lre.match(line)
     if m:
         symbol = m.group(1)
         if symbol not in labelsymboltable:
             labelsymboltable[symbol] = linecounter
         if symbol in undefinedsymboltable:
-            undefinedsymboltable -= symbol
+            undefinedsymboltable.remove(symbol)
         return 'l'
     else:
         return 'w'
@@ -149,5 +152,21 @@ with open(outputfilename, "w") as outputFile:
         addressymboltable[symbol] = nextvar
         nextvar += 1
     for cmd in cmdlist:
-        print(cmd)
-        outputFile.write(cmd)
+        if cmd in addressymboltable:
+            output = format(addressymboltable[cmd], 'b')
+            filler = ''
+            for i in range(16-len(output)):
+                filler += '0'
+            filler += output
+            filler += '\n'
+            outputFile.write(filler)
+        elif cmd in labelsymboltable:
+            output = format(labelsymboltable[cmd], 'b')
+            filler = ''
+            for i in range(16-len(output)):
+                filler += '0'
+            filler += output
+            filler += '\n'
+            outputFile.write(filler)
+        else:
+            outputFile.write(cmd)
