@@ -82,9 +82,6 @@ jumpdict = {None: '000',
 undefinedsymboltable = []
 labelsymboltable = {}
 nextvar = 16
-# TODO: finish symboltable()
-# TODO: create list of commands and symboltable simultaneosly, then transcribe
-# to .hack file
 
 
 # Encapsulates access to teh input code. Reads an assembly language command,
