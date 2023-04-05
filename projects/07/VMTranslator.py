@@ -2,6 +2,7 @@
 
 import re
 import sys
+from pathlib import Path
 
 # TODO: translate from vmcode to hack
 
@@ -13,12 +14,13 @@ outputfilename = inputfilename.rsplit('.', 1)[0] + '.asm'
 # letters {4,8},
 # whitespace?, (register address) numbers *]
 cmd = re.compile(r'^\s*([a-z]{2,4})(?:\s([a-z]{4,8})\s([0-9]*))?')
+
 ADD = """\
+    // add
 @SP     // Set A-register to SP
 A=M-1   // M is the location of the 1st empty stack location, so this sets A to
         // the location of the top-most stack item.
 D=M     // Save the top-most stack value
-M=0     // Clears the top-most stack value
 A=A-1   // Sets A to the new top of the stack (back 1).
 M=M+D   // Add the saved former top-most stack value to the new top-most stack
         // value.
@@ -26,11 +28,11 @@ M=M+D   // Add the saved former top-most stack value to the new top-most stack
 M=M-1
 """
 SUB = """\
+    // sub
 @SP     // Set A-register to SP
 A=M-1   // M is the location of the 1st empty stack location, so this sets A to
         // the location of the top-most stack item.
 D=M     // Save the top-most stack value
-M=0     // Clears the top-most stack value
 A=A-1   // Sets A to the new top of the stack (back 1).
 M=M-D   // Subtract the saved former top-most stack value to the new top-most
         // stack value.
@@ -38,16 +40,17 @@ M=M-D   // Subtract the saved former top-most stack value to the new top-most
 M=M-1
 """
 NEG = '''\
+    // neg
 @SP     // Set A-register to SP
 A=M-1   // M is the location of the 1st empty stack location, so this sets A to
         // the location of the top-most stack item.
 M=-M    // Negate the value of the topmost value of the stack
 '''
 EQ = '''\
+    // eq
 @SP     // set a-reg to SP
 A=M-1   // set a to topmost item in stack
 D=M     // save topmost stack item
-M=0     // clear topmost stack item
 A=A-1   // de-index a to new topmost stack item
 M=M-D   // subtract saved value from current topmost stack value
 D=M     // sets saves topmost stack value
@@ -67,35 +70,36 @@ M=-1     // sets m to true
 (FALSE{0})
 '''
 AND = '''\
+    // and
+@SP     // goes to stack pointer pointer
+A=M-1   // goes to top of stack
+D=M     // saves top of stack
+A=A-1   // moves to second topmost stack location
+M=M&D   // ands contents of secondmost and topmost stack locations
 @SP
-A=M-1
-D=M
-M=0
-A=A-1
-M=M&D
-@SP
-M=M-1
+M=M-1   // decrements stack pointer
 '''
 OR = '''\
+    // or
 @SP
-A=M-1
-D=M
-M=0
-A=A-1
-M=M|D
+A=M-1   // goes to top of stack
+D=M     // saves top of stack
+A=A-1   // goes to second topmost location in stack
+M=M|D   // ors together topmost and second topmost
 @SP
 M=M-1
 '''
 NOT = '''\
+    // not
 @SP
 A=M-1
-M=!M
+M=!M    // nots the topmost stack location
 '''
 GT = '''\
+    // greater than
 @SP     // set a-reg to SP
 A=M-1   // set a to topmost item in stack
 D=M     // save topmost stack item
-M=0     // clear topmost stack item
 A=A-1   // de-index a to new topmost stack item
 M=M-D   // subtract saved value from current topmost stack value
 D=M     // sets saves topmost stack value
@@ -115,6 +119,7 @@ M=-1     // sets m to true
 (FALSE{0})
 '''
 LT = '''\
+    // less than
 @SP     // set a-reg to SP
 A=M-1   // set a to topmost item in stack
 D=M     // save topmost stack item
@@ -138,34 +143,105 @@ M=-1     // sets m to true
 (FALSE{0})
 '''
 PCONST = '''\
-@{}
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
+    // push constant {0}
+@{0}     // given the command push constant [num], goes to the given [num]
+D=A     // saves this number
+@SP     // goes to stack pointer pointer
+A=M     // goes to stack pointer
+M=D     // adds the saved number to the stack
+@SP     // goes to stack pointer pointer
+M=M+1   // increments stack pointer
 '''
 END = '''\
+    // end loop
 (END)
 @END
 0;JMP
 '''
-cmddict = {'add': ADD,
-           'sub': SUB,
-           'neg': NEG,
-           'eq': EQ,
-           'gt': GT,
-           'lt': LT,
-           'and': AND,
-           'or': OR,
-           'not': NOT,
-           'push constant': PCONST,
-           'end': END}
+PUSH = '''\
+    // push {0} {1}
+@{0}    // sets A to the pointer of the register it will read from (local,
+        // argument, etc.)
+D=M     // saves the location stored in this pointer
+@{1}    // goes to the address part of the code, for example given push local
+        // 5, it will go to the memory location 5
+A=A+D   // adds together the register and adress to get to the address it
+        // should be at
+D=M     // saves the contents of this memory location
+@SP     // goes to memory location that points to stack pointer
+A=M     // goes to stack pointer
+M=D     // sets register to saved value
+@SP     // goes to memory location that points to stack pointer
+M=M+1   // incrememts stack pointer
+'''
+PUSTAT = '''\
+    // push static {1}
+@{0}.{1}    // creates variable [filename].[num]
+D=M     // sets d to contents of m
+@SP     // goes to stack pointer pointer
+A=M     // goes to stack pointer
+M=D     // pushes contents of variable to stack
+@SP     // goes to stack pointer pointer
+M=M+1   // increments
+'''
+POP = '''\
+    // pop {0} {1}
+@SP     // goes to register that points to stack pointer
+A=M-1   // goes to top of stack
+D=M     // saves top of stack
+@popval // creates variable
+M=D     // stores top value of stack in variable
+@SP     // goes to stack pointer pointer
+M=M-1   // decrements stack pointer
+@{0}    // given pop [register] [address], goes to pointer of beginning of
+        // given register
+D=M     // saves location
+@{1}    // goes to [address]
+A=A+D   // goes to [address] + [register]
+D=A     // saves location
+@location   // creates variable
+M=D     // saves location in variable
+@popval // goes to variable that contains popped value
+D=M     // retrieves popped value
+@location   // goes to variable that holds location where popped value should
+        // be stored
+A=M     // goes to location where popped value should be stored
+M=D     // sets location to popped value
+'''
+POSTAT = '''\
+    // pop static {1}
+@SP     // goes to register that points to stack pointer
+A=M-1   // goes to top of stack
+D=M     // saves top of stack
+@{0}.{1}    // goes to variable [filename].[number]
+M=D     // saves location in variable
+@SP     // goes to stack pointer pointer
+M=M-1   // decrements stack pointer
+'''
+
+# dictionary of commands
+cmddict = {
+    'add': ADD,
+    'sub': SUB,
+    'neg': NEG,
+    'eq': EQ,
+    'gt': GT,
+    'lt': LT,
+    'and': AND,
+    'or': OR,
+    'not': NOT,
+    'push constant': PCONST,
+    'push static': PUSTAT,
+    'pop static': POSTAT,
+    'push': PUSH,
+    'pop': POP,
+    'end': END
+}
 
 
 def parser(line):
-    '''parses each line and returns what kind of command it is.'''
+    '''parses each line and returns what kind of command it is, along with the
+    arguments that kind of command needs.'''
     matchCmd = cmd.match(line)
     if matchCmd:
         command = matchCmd.group(1)
@@ -173,8 +249,19 @@ def parser(line):
         address = matchCmd.group(3)
         if register is None and address is None:
             return "arithmetic", command
-        else:
-            return "push", command, register, address
+        elif command == 'pop':
+            if register == 'static':
+                return 'popStatic', inputfilename, address
+            else:
+                return 'pop', register, address
+            return 'pushStatic', inputfilename, address
+        elif command == 'push':
+            if register == 'constant':
+                return 'pushConstant', address
+            elif register == 'static':
+                return 'pushStatic', inputfilename, address
+            else:
+                return 'push', register, address
     else:
         return 'o'
 
@@ -185,16 +272,73 @@ def arithmetic(command):
     num += 1
 
 
-def push(command, register, address):
-    cmdlist.append(cmddict[command+' '+register].format(address))
+def pushConstant(address):
+    cmdlist.append(cmddict['push constant'].format(address))
+
+
+def pushStatic(filename, address):
+    cmdlist.append(cmddict['push static'].format(Path(filename).stem, address))
+
+
+def push(register, address):
+    '''figures out which register to push to before writing the command'''
+    if register == 'local':
+        reg = 'LCL'
+    elif register == 'argument':
+        reg = 'ARG'
+    elif register == 'this':
+        reg = 'THIS'
+    elif register == 'that':
+        reg = 'THAT'
+    elif register == 'temp':
+        reg = '5'
+    elif register == 'pointer':
+        reg = '3'
+    cmdlist.append(cmddict['push'].format(reg, address))
+
+
+def pop(register, address):
+    if register == 'local':
+        reg = 'LCL'
+    elif register == 'argument':
+        reg = 'ARG'
+    elif register == 'this':
+        reg = 'THIS'
+    elif register == 'that':
+        reg = 'THAT'
+    elif register == 'temp':
+        reg = '5'
+    elif register == 'pointer':
+        reg = '3'
+    cmdlist.append(cmddict['push'].format(reg, address))
+
+
+def popStatic(filename, address):
+    cmdlist.append(cmddict['pop static'].format(Path(filename).stem, address))
 
 
 def other():
+    '''whitespace, comments, etc. isn't added to the hack code'''
     pass
 
 
-funcs = {'arithmetic': arithmetic, 'push': push, 'o': other}
+# each function in this list other than 'other' writes the corresponding code
+# to the output file
+funcs = {
+    'arithmetic': arithmetic,
+    'pushConstant': pushConstant,
+    'push': push,
+    'pop': pop,
+    'popStatic': popStatic,
+    'pushStatic': pushStatic,
+    'o': other
+}
 
+# reads inputfile and sends each line to the parser, then uses the parser's
+# output to send the right arguments to the right function which then returns
+# the correct translated code, which is then written to the outputfile. after
+# the entire program has been translated, an infinite loop is added to the end
+# of the file to terminate the code and prevent any other code from being run.
 with open(inputfilename, 'r') as fileToTranslate:
     cmdlist = []
     num = 0
@@ -205,9 +349,15 @@ with open(outputfilename, 'w') as outputFile:
     for cmd in cmdlist:
         outputFile.write(cmd)
     outputFile.write(cmddict['end'])
-print('Translation complete!')
+# just a nice touch to make it more user friendly
+print('''
+      =================================================================
+                            Translation Complete!
+      =================================================================
+      ''')
 
 
+# pytest for regex.
 def test_answer():
     tsts = [('push constant 1', ('push', 'constant', '1')),
             ('    eq', ('eq', None, None)),
