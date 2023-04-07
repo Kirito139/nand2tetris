@@ -158,6 +158,22 @@ END = '''\
 @END
 0;JMP
 '''
+PUPOI = '''\
+    // push {0} {1}
+@{0}    // sets A to the pointer of the register it will read from (local,
+        // argument, etc.)
+D=A     // saves this location
+@{1}    // goes to the address part of the code, for example given push local
+        // 5, it will go to the memory location 5
+A=A+D   // adds together the register and adress to get to the address it
+        // should be at
+D=M     // saves the contents of this memory location
+@SP     // goes to memory location that points to stack pointer
+A=M     // goes to stack pointer
+M=D     // sets register to saved value
+@SP     // goes to memory location that points to stack pointer
+M=M+1   // incrememts stack pointer
+'''
 PUSH = '''\
     // push {0} {1}
 @{0}    // sets A to the pointer of the register it will read from (local,
@@ -174,6 +190,7 @@ M=D     // sets register to saved value
 @SP     // goes to memory location that points to stack pointer
 M=M+1   // incrememts stack pointer
 '''
+
 PUSTAT = '''\
     // push static {1}
 @{0}.{1}    // creates variable [filename].[num]
@@ -218,6 +235,30 @@ M=D     // saves location in variable
 @SP     // goes to stack pointer pointer
 M=M-1   // decrements stack pointer
 '''
+POPOI = '''\
+    // pop {0} {1}
+@SP     // goes to register that points to stack pointer
+A=M-1   // goes to top of stack
+D=M     // saves top of stack
+@popval // creates variable
+M=D     // stores top value of stack in variable
+@SP     // goes to stack pointer pointer
+M=M-1   // decrements stack pointer
+@{0}    // given pop [register] [address], goes to pointer of beginning of
+        // given register
+D=A     // saves location
+@{1}    // goes to [address]
+A=A+D   // goes to [address] + [register]
+D=A     // saves location
+@location   // creates variable
+M=D     // saves location in variable
+@popval // goes to variable that contains popped value
+D=M     // retrieves popped value
+@location   // goes to variable that holds location where popped value should
+        // be stored
+A=M     // goes to location where popped value should be stored
+M=D     // sets location to popped value
+'''
 
 # dictionary of commands
 cmddict = {
@@ -233,6 +274,8 @@ cmddict = {
     'push constant': PCONST,
     'push static': PUSTAT,
     'pop static': POSTAT,
+    'pop pointer': POPOI,
+    'push pointer': PUPOI,
     'push': PUSH,
     'pop': POP,
     'end': END
@@ -248,18 +291,21 @@ def parser(line):
         register = matchCmd.group(2)
         address = matchCmd.group(3)
         if register is None and address is None:
-            return "arithmetic", command
+            return 'arithmetic', command
         elif command == 'pop':
             if register == 'static':
                 return 'popStatic', inputfilename, address
+            elif register == 'pointer' or register == 'temp':
+                return 'popPointer', register, address
             else:
                 return 'pop', register, address
-            return 'pushStatic', inputfilename, address
         elif command == 'push':
             if register == 'constant':
                 return 'pushConstant', address
             elif register == 'static':
                 return 'pushStatic', inputfilename, address
+            elif register == 'pointer' or register == 'temp':
+                return 'pushPointer', register, address
             else:
                 return 'push', register, address
     else:
@@ -290,11 +336,15 @@ def push(register, address):
         reg = 'THIS'
     elif register == 'that':
         reg = 'THAT'
-    elif register == 'temp':
+    cmdlist.append(cmddict['push'].format(reg, address))
+
+
+def pushPointer(register, address):
+    if register == 'temp':
         reg = '5'
     elif register == 'pointer':
         reg = '3'
-    cmdlist.append(cmddict['push'].format(reg, address))
+    cmdlist.append(cmddict['push pointer'].format(reg, address))
 
 
 def pop(register, address):
@@ -306,15 +356,19 @@ def pop(register, address):
         reg = 'THIS'
     elif register == 'that':
         reg = 'THAT'
-    elif register == 'temp':
-        reg = '5'
-    elif register == 'pointer':
-        reg = '3'
-    cmdlist.append(cmddict['push'].format(reg, address))
+    cmdlist.append(cmddict['pop'].format(reg, address))
 
 
 def popStatic(filename, address):
     cmdlist.append(cmddict['pop static'].format(Path(filename).stem, address))
+
+
+def popPointer(register, address):
+    if register == 'temp':
+        reg = '5'
+    elif register == 'pointer':
+        reg = '3'
+    cmdlist.append(cmddict['pop pointer'].format(reg, address))
 
 
 def other():
@@ -327,8 +381,10 @@ def other():
 funcs = {
     'arithmetic': arithmetic,
     'pushConstant': pushConstant,
+    'pushPointer': pushPointer,
     'push': push,
     'pop': pop,
+    'popPointer': popPointer,
     'popStatic': popStatic,
     'pushStatic': pushStatic,
     'o': other
