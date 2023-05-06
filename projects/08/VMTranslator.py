@@ -11,14 +11,16 @@ global num
 global returnNum
 global returnArr
 global returnLabel
-path = sys.argv[1]
+
 returnNum = 0
-if os.path.splitext(os.path.normpath(path))[1] == '':
-    outputfilename = os.path.splitext(os.path.normpath(
-        path))[0]+'/'+os.path.basename(os.path.normpath(path))+'.asm'
+path = os.path.normpath(sys.argv[1])
+if os.path.splitext(path)[1] == '':
+    inputfiles = glob.glob(path + '/*.vm')
+    outputfilename = os.path.splitext(path)[0]+'/'+os.path.basename(
+        path)+'.asm'
 else:
-    outputfilename = os.path.splitext(os.path.basename(os.path.normpath(
-        path)))[0]+'.asm'
+    inputfiles = [path]
+    outputfilename = os.path.splitext(path)[0]+'.asm'
 # regex matches a sequence of [whitespace*, (command) lowercase characters
 # {2,4}, (register and address, optional) whitespace ?,(register) lowercase
 # letters {4,8},
@@ -385,13 +387,14 @@ RETURN = '''\
     // return ({0})
 @LCL
 D=M
+
 @FRAME
 M=D     // sets frame to LCL
-// @5
-// A=D-A   // sets a to frame-5
-// D=M     // sets d to m
-// @RETURN{0}
-// M=D     // sets return{0} to the contents of frame-5
+@5
+A=D-A   // sets a to frame-5
+D=M     // sets d to m
+@RET
+M=D     // sets return{0} to the contents of frame-5
 @SP     // goes to register that points to stack pointer
 A=M-1   // goes to top of stack
 D=M     // saves top of stack
@@ -430,8 +433,7 @@ A=A-1
 D=M
 @LCL
 M=D
-@SP
-A=M-1
+@RET
 A=M
 0;JMP
 '''
@@ -599,18 +601,13 @@ def ifto(label):
 
 
 def Return(fname):
-    global returnNum
     global returnArr
     cmdlist.append(cmddict['return'].format(returnArr[-1]))
     returnArr.pop()
     print('returnArr:', returnArr)
-    returnNum -= 1
 
 
 def function(fname, vargs):
-    # returnNum represents which layer of nesting the code is on. increments
-    # when function is declared, decrements when returning.
-    global returnNum
     # returnArr is the list of numbers to append to labels in order to make
     # them unique and avoid duplicates
     global returnArr
@@ -622,12 +619,10 @@ def function(fname, vargs):
         returnArr.append(fname)
         print('returnArr:', returnArr)
     cmdlist.append(cmddict['function'].format(fname, vargs, fname))
+    # TODO: make sure the return comments are accurate, fix breakpoints
 
 
 def call(fname, vargs):
-    if fname not in returnArr:
-        returnArr.append(fname)
-        print('returnArr:', returnArr)
     cmdlist.append(cmddict['call'].format(fname, vargs, fname))
 
 
@@ -661,7 +656,7 @@ funcs = {
 # the correct translated code, which is then written to the outputfile. after
 # the entire program has been translated, an infinite loop is added to the end
 # of the file to terminate the code and prevent any other code from being run.
-inputfiles = glob.glob(path + '/*.vm')
+
 
 returnArr = [0]
 cmdlist = ['''\
