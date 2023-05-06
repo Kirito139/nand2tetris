@@ -382,7 +382,7 @@ M=D
 (RETURN{2})
 '''
 RETURN = '''\
-    // return
+    // return ({0})
 @LCL
 D=M
 @FRAME
@@ -473,6 +473,7 @@ def parser(line):
     if matchFnc:
         command = matchFnc.group(1)
         fname = matchFnc.group(2)
+        print('fname', fname, 'line', line)
         vargs = matchFnc.group(3)
         return func(command, fname, vargs)
     elif matchLbl:
@@ -490,6 +491,7 @@ def parser(line):
 
 def func(command, fname, vargs):
     if command == 'return':
+        print('return', fname)
         return 'return', fname
     else:
         return command, fname, vargs
@@ -599,8 +601,9 @@ def ifto(label):
 def Return(fname):
     global returnNum
     global returnArr
-    cmdlist.append(cmddict['return'].format(fname))
+    cmdlist.append(cmddict['return'].format(returnArr[-1]))
     returnArr.pop()
+    print('returnArr:', returnArr)
     returnNum -= 1
 
 
@@ -615,13 +618,16 @@ def function(fname, vargs):
     # function is declared, never decrements.
     global returnLabel
     # inserts a number to returnArr at index returnNum
-    returnArr.append(returnLabel)
-    returnLabel += 1
+    if fname not in returnArr:
+        returnArr.append(fname)
+        print('returnArr:', returnArr)
     cmdlist.append(cmddict['function'].format(fname, vargs, fname))
-    returnNum += 1
 
 
 def call(fname, vargs):
+    if fname not in returnArr:
+        returnArr.append(fname)
+        print('returnArr:', returnArr)
     cmdlist.append(cmddict['call'].format(fname, vargs, fname))
 
 
