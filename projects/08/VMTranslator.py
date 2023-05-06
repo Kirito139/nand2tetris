@@ -660,74 +660,74 @@ funcs = {
 
 returnArr = [0]
 cmdlist = ['''\
-//            // bootstrap code
-// // initialize stack pointer to 0x0100
-// @256
-// D=A
-// @SP
-// M=D
-//     // calls function Sys.init, stating that 0 arguments have been pushed to
-//     // the stack
-// // push return address
-// @RETURN
-// D=A
-// @SP
-// A=M     // goes to stack pointer
-// M=D     // sets register to saved value
-// @SP     // goes to memory location that points to stack pointer
-// M=M+1   // incrememts stack pointer
-// // push LCL
-// @LCL
-// D=M
-// @SP
-// A=M     // goes to stack pointer
-// M=D     // sets register to saved value
-// @SP     // goes to memory location that points to stack pointer
-// M=M+1   // incrememts stack pointer
-// // push ARG
-// @ARG
-// D=M
-// @SP
-// A=M     // goes to stack pointer
-// M=D     // sets register to saved value
-// @SP     // goes to memory location that points to stack pointer
-// M=M+1   // incrememts stack pointer
-// // push THIS
-// @THIS
-// D=M
-// @SP
-// A=M     // goes to stack pointer
-// M=D     // sets register to saved value
-// @SP     // goes to memory location that points to stack pointer
-// M=M+1   // incrememts stack pointer
-// // push THAT
-// @THAT
-// D=M
-// @SP
-// A=M     // goes to stack pointer
-// M=D     // sets register to saved value
-// @SP     // goes to memory location that points to stack pointer
-// M=M+1   // incrememts stack pointer
-// // ARG = SP-n-5
-// @SP
-// D=M
-// @ARG
-// M=D     // arg = sp
-// @0      // states 0 args pushed to stack
-// D=A
-// @ARG
-// M=M-D   // arg = sp-n
-// @5
-// D=A
-// @ARG
-// M=M-D   // arg = sp-n-5
-// @SP
-// D=M
-// @LCL
-// M=D
-// @Sys.init
-// 0;JMP
-// (RETURN)
+           // bootstrap code
+// initialize stack pointer to 0x0100
+@256
+D=A
+@SP
+M=D
+    // calls function Sys.init, stating that 0 arguments have been pushed to
+    // the stack
+// push return address
+@RETURN
+D=A
+@SP
+A=M     // goes to stack pointer
+M=D     // sets register to saved value
+@SP     // goes to memory location that points to stack pointer
+M=M+1   // incrememts stack pointer
+// push LCL
+@LCL
+D=M
+@SP
+A=M     // goes to stack pointer
+M=D     // sets register to saved value
+@SP     // goes to memory location that points to stack pointer
+M=M+1   // incrememts stack pointer
+// push ARG
+@ARG
+D=M
+@SP
+A=M     // goes to stack pointer
+M=D     // sets register to saved value
+@SP     // goes to memory location that points to stack pointer
+M=M+1   // incrememts stack pointer
+// push THIS
+@THIS
+D=M
+@SP
+A=M     // goes to stack pointer
+M=D     // sets register to saved value
+@SP     // goes to memory location that points to stack pointer
+M=M+1   // incrememts stack pointer
+// push THAT
+@THAT
+D=M
+@SP
+A=M     // goes to stack pointer
+M=D     // sets register to saved value
+@SP     // goes to memory location that points to stack pointer
+M=M+1   // incrememts stack pointer
+// ARG = SP-n-5
+@SP
+D=M
+@ARG
+M=D     // arg = sp
+@0      // states 0 args pushed to stack
+D=A
+@ARG
+M=M-D   // arg = sp-n
+@5
+D=A
+@ARG
+M=M-D   // arg = sp-n-5
+@SP
+D=M
+@LCL
+M=D
+@Sys.init
+0;JMP
+(RETURN)
 ''']
 num = 0
 returnLabel = 0
