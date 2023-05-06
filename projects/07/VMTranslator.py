@@ -4,7 +4,6 @@ import re
 import sys
 from pathlib import Path
 
-# TODO: translate from vmcode to hack
 
 global num
 inputfilename = sys.argv[1]
