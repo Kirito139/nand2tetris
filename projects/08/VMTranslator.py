@@ -8,11 +8,11 @@ from pathlib import Path
 
 
 global num
-global returnNum
+global callNum
 global returnArr
 global returnLabel
 
-returnNum = 0
+callNum = 0
 path = os.path.normpath(sys.argv[1])
 if os.path.splitext(path)[1] == '':
     inputfiles = glob.glob(path + '/*.vm')
@@ -121,7 +121,7 @@ D=M     // sets saves topmost stack value
 @SP
 M=M-1
 @TRUE{0} // sets a to continue point
-D;JGT   // jump if d is zero
+D;JGT   // jump if d is greater than zero
 @SP     // sets a to stack pointer
 A=M-1   // go to topmost stack value
 M=0    // sets m to false
@@ -145,7 +145,7 @@ D=M     // sets saves topmost stack value
 @SP
 M=M-1
 @TRUE{0} // sets a to continue point
-D;JLT   // jump if d is zero
+D;JLT   // jump if d is less than zero
 @SP     // sets a to stack pointer
 A=M-1   // go to topmost stack value
 M=0    // sets m to false
@@ -623,7 +623,9 @@ def function(fname, vargs):
 
 
 def call(fname, vargs):
-    cmdlist.append(cmddict['call'].format(fname, vargs, fname))
+    global callNum
+    callNum += 1
+    cmdlist.append(cmddict['call'].format(fname, vargs, callNum))
 
 
 def other():
