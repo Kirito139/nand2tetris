@@ -13,14 +13,6 @@ global returnArr
 global returnLabel
 
 callNum = 0
-path = os.path.normpath(sys.argv[1])
-if os.path.splitext(path)[1] == '':
-    inputfiles = glob.glob(path + '/*.vm')
-    outputfilename = os.path.splitext(path)[0]+'/'+os.path.basename(
-        path)+'.asm'
-else:
-    inputfiles = [path]
-    outputfilename = os.path.splitext(path)[0]+'.asm'
 # regex matches a sequence of [whitespace*, (command) lowercase characters
 # {2,4}, (register and address, optional) whitespace ?,(register) lowercase
 # letters {4,8},
@@ -504,7 +496,7 @@ def comd(command, register, address):
         return 'arithmetic', command
     elif command == 'pop':
         if register == 'static':
-            return 'popStatic', inputfiles[f], address
+            return 'popStatic', f, address
         elif register == 'pointer' or register == 'temp':
             return 'popPointer', register, address
         else:
@@ -513,7 +505,7 @@ def comd(command, register, address):
         if register == 'constant':
             return 'pushConstant', address
         elif register == 'static':
-            return 'pushStatic', inputfiles[f], address
+            return 'pushStatic', f, address
         elif register == 'pointer' or register == 'temp':
             return 'pushPointer', register, address
         else:
@@ -661,76 +653,86 @@ funcs = {
 
 
 returnArr = [0]
-cmdlist = ['''\
-           // bootstrap code
-// initialize stack pointer to 0x0100
-@256
-D=A
-@SP
-M=D
-    // calls function Sys.init, stating that 0 arguments have been pushed to
-    // the stack
-// push return address
-@RETURN
-D=A
-@SP
-A=M     // goes to stack pointer
-M=D     // sets register to saved value
-@SP     // goes to memory location that points to stack pointer
-M=M+1   // incrememts stack pointer
-// push LCL
-@LCL
-D=M
-@SP
-A=M     // goes to stack pointer
-M=D     // sets register to saved value
-@SP     // goes to memory location that points to stack pointer
-M=M+1   // incrememts stack pointer
-// push ARG
-@ARG
-D=M
-@SP
-A=M     // goes to stack pointer
-M=D     // sets register to saved value
-@SP     // goes to memory location that points to stack pointer
-M=M+1   // incrememts stack pointer
-// push THIS
-@THIS
-D=M
-@SP
-A=M     // goes to stack pointer
-M=D     // sets register to saved value
-@SP     // goes to memory location that points to stack pointer
-M=M+1   // incrememts stack pointer
-// push THAT
-@THAT
-D=M
-@SP
-A=M     // goes to stack pointer
-M=D     // sets register to saved value
-@SP     // goes to memory location that points to stack pointer
-M=M+1   // incrememts stack pointer
-// ARG = SP-n-5
-@SP
-D=M
-@ARG
-M=D     // arg = sp
-@0      // states 0 args pushed to stack
-D=A
-@ARG
-M=M-D   // arg = sp-n
-@5
-D=A
-@ARG
-M=M-D   // arg = sp-n-5
-@SP
-D=M
-@LCL
-M=D
-@Sys.init
-0;JMP
-(RETURN)
-''']
+path = os.path.normpath(sys.argv[1])
+if os.path.splitext(path)[1] == '':
+    inputfiles = glob.glob(path + '/*.vm')
+    outputfilename = os.path.splitext(path)[0]+'/'+os.path.basename(
+        path)+'.asm'
+    cmdlist = ['''\
+            // bootstrap code
+    // initialize stack pointer to 0x0100
+    @256
+    D=A
+    @SP
+    M=D
+        // calls function Sys.init, stating that 0 args have been pushed to
+        // the stack
+    // push return address
+    @RETURN
+    D=A
+    @SP
+    A=M     // goes to stack pointer
+    M=D     // sets register to saved value
+    @SP     // goes to memory location that points to stack pointer
+    M=M+1   // incrememts stack pointer
+    // push LCL
+    @LCL
+    D=M
+    @SP
+    A=M     // goes to stack pointer
+    M=D     // sets register to saved value
+    @SP     // goes to memory location that points to stack pointer
+    M=M+1   // incrememts stack pointer
+    // push ARG
+    @ARG
+    D=M
+    @SP
+    A=M     // goes to stack pointer
+    M=D     // sets register to saved value
+    @SP     // goes to memory location that points to stack pointer
+    M=M+1   // incrememts stack pointer
+    // push THIS
+    @THIS
+    D=M
+    @SP
+    A=M     // goes to stack pointer
+    M=D     // sets register to saved value
+    @SP     // goes to memory location that points to stack pointer
+    M=M+1   // incrememts stack pointer
+    // push THAT
+    @THAT
+    D=M
+    @SP
+    A=M     // goes to stack pointer
+    M=D     // sets register to saved value
+    @SP     // goes to memory location that points to stack pointer
+    M=M+1   // incrememts stack pointer
+    // ARG = SP-n-5
+    @SP
+    D=M
+    @ARG
+    M=D     // arg = sp
+    @0      // states 0 args pushed to stack
+    D=A
+    @ARG
+    M=M-D   // arg = sp-n
+    @5
+    D=A
+    @ARG
+    M=M-D   // arg = sp-n-5
+    @SP
+    D=M
+    @LCL
+    M=D
+    @Sys.init
+    0;JMP
+    (RETURN)
+    ''']
+else:
+    inputfiles = [path]
+    outputfilename = os.path.splitext(path)[0]+'.asm'
+    cmdlist = []
+
 num = 0
 returnLabel = 0
 for f in inputfiles:
