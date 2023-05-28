@@ -1,0 +1,11 @@
+class Score {
+	function void updateScore(int score, int numlen) {
+		var int cursor_j;
+		let cursor_j = (64 - numlen);
+		do Output.moveCursor(0,63);
+		do Output.printString("00000");
+		do Output.moveCursor(0,cursor_j);
+		do Output.printInt(score);
+		return;
+	}
+}

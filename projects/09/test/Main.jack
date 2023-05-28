@@ -1,0 +1,74 @@
+class Main {
+	function void main() {
+		var DinoGame game;
+		let game = DinoGame.new();
+		do game.run();
+		do game.dispose();
+		return;
+	}
+
+	// function void tst() {
+	// 	var int score;
+	// 	var int numlen;
+	// 	var int dinox;
+	// 	var int dinoy;
+	// 	let numlen = 1;
+	// 	let score = 0;
+	// 	let dinox = 5;
+	// 	let dinoy = 5;
+	// 	while (dinoy < 20) {
+	// 		let dinoy = dinoy + 1;
+	// 		do Dino.draw(dinox, dinoy);
+	// 		let dinoy = dinoy + 1;
+	// 	}
+	// 	while (score < 500) {
+	// 		do Score.updateScore(score, numlen);
+	// 		do Sys.wait(15);
+	// 		let score = score + 1;
+	// 		if (score = 10 * numlen) {
+	// 			let numlen = numlen + 1;
+	// 		}
+	// 	}
+	// 	return;
+	// }
+
+
+	// function void test() {
+	// 	var int score;
+	// 	let score = 05234;
+	// 	do Main.testchar(0);
+	// 	do Main.zero(1);
+	// 	do Main.zero(2);
+	// 	// do Main.zero(32);
+	// 	do Output.moveCursor(5,5);
+	// 	do Output.printInt(score);
+	// 	let score = 05235;
+	// 	do Sys.wait(10000);
+	// 	do Output.moveCursor(5, 5);
+	// 	do Output.printInt(score);
+	// 	return;
+	// }
+
+
+	// function void zero(int location) {
+	// 	var int memAddress;
+	// 	let memAddress = 16384+location;
+	// 	do Memory.poke(memAddress+0, 2016);
+	// 	do Memory.poke(memAddress+32, 4080);
+	// 	do Memory.poke(memAddress+64, 6168);
+	// 	do Memory.poke(memAddress+96, 7192);
+	// 	do Memory.poke(memAddress+128, 7704);
+	// 	do Memory.poke(memAddress+160, 7960);
+	// 	do Memory.poke(memAddress+192, 7064);
+	// 	do Memory.poke(memAddress+224, 6616);
+	// 	do Memory.poke(memAddress+256, 6392);
+	// 	do Memory.poke(memAddress+288, 6264);
+	// 	do Memory.poke(memAddress+320, 6200);
+	// 	do Memory.poke(memAddress+352, 6168);
+	// 	do Memory.poke(memAddress+384, 6168);
+	// 	do Memory.poke(memAddress+416, 6168);
+	// 	do Memory.poke(memAddress+448, 4080);
+	// 	do Memory.poke(memAddress+480, 2016);
+	// 	return;
+	// }
+}

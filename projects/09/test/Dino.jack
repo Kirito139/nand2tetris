@@ -1,0 +1,64 @@
+/** Implements a graphical dino. */
+class Dino {
+
+	field int x, y; // screen location of the dino's top-left corner
+	field int airtime; // how long the dino has been in the air
+
+	/** Constructs a new dino with a given location **/
+	constructor Dino new(int dinox, int dinoy) {
+		let x = dinox;
+		let y = dinoy;
+		let airtime = 0;
+		do draw();
+		return this;
+	}
+
+	/** disposes this dino */
+	method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+	}
+
+	/** draws the dino on the screen */
+	method void draw() {
+		do Screen.setColor(true);
+		do Screen.drawRectangle(x, y, x+16, y+16);
+		return;
+	}
+
+	/** erases the dino from the screen */
+	method void erase() {
+		do Screen.setColor(false);
+		do Screen.drawRectangle(x,y, x+16, y+16);
+		return;
+	}
+	
+	/** moves dino up by 2 pixels */
+	method void moveUp() {
+		if (y > 1) {
+			do erase();
+			let y = y - 2;
+			do draw();
+		}
+		return;
+	}
+	
+	/** moves dino down by 2 pixels */
+	method void moveDown() {
+		if ((y + 16) < 254) {
+			do erase();
+			let y = y + 2;
+			do draw();
+		}
+		return;
+	}
+
+	/** handles all dino movement */
+	// method void move() {
+	// 	if (airtime < 9) { do dino.moveUp(); }
+	// 	else { do dino.moveDown(); }
+	// 	if (airtime = 18) { let airtime = 0; }
+	// 	else { let airtime = airtime + 1; }
+	// 	return;
+	// }
+}
