@@ -118,7 +118,7 @@ class Cactus {
 		return;
 	}
 	
-	/** moves the cactus left by 2 pixels */
+	/** moves the cactus left by 16 pixels */
 	method void moveLeft() {
 		if (location > 7071) {
 			do erase();
@@ -128,7 +128,7 @@ class Cactus {
 		return;
 	}
 	method boolean checkEdge() {
-		if (location < 7072) { return true; }
+		if (location < 7073) { return true; }
 		return false;
 	}
 	method boolean checkTouch() {

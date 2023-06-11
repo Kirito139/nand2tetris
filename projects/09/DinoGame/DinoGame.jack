@@ -118,43 +118,44 @@ class DinoGame {
 
 	/** moves, adds, and removes cacti */
 	method void updateCacti() {
-		/* makes sure there are up to five cacti at a time with a minium of 50
+		/* makes sure there are up to five cacti at a time with a minium of 30
 		 * calls of this function in between. whether or not a cactus is actually
 		 * created is supposed to be relatively random
 		 */
+		// TODO: make cacti more random
 		if ((cactarray[0] = false) & (cactimer1 = 0)) {
 			let nextCact = 0;
 			let cactimer = 30;
-			let cactimer1 = 65;
+			let cactimer1 = 50;
 		}
-		// else {
+		else {
 			if ((cactarray[1] = false) & (cactimer2 = 0)) {
 				let nextCact = 1;
 				let cactimer = 30;
-				let cactimer2 = 70;
+				let cactimer2 = 60;
 			}
-		// 	else {
+			else {
 				if ((cactarray[2] = false) & (cactimer3 = 0)) {
 					let nextCact = 2;
 					let cactimer = 30;
-					let cactimer3 = 75;
+					let cactimer3 = 70;
 				}
-		// 		else {
+				else {
 					if ((cactarray[3] = false) & (cactimer4 = 0)) {
 						let nextCact = 3;
 						let cactimer = 30;
 						let cactimer4 = 80;
 					}
-		// 			else {
+					else {
 						if ((cactarray[4] = false) & (cactimer5 = 0)) {
 							let nextCact = 4;
 							let cactimer = 30;
 							let cactimer5 = 90;
 						}
-		// 			}
-		// 		}
-		// 	}
-		// }
+					}
+				}
+			}
+		}
 		if (/*(rand(3)) & */(numCact < 5) & (cactimer = 0)) {
 			let cactarray[nextCact] = Cactus.new(1);
 			let numCact = numCact + 1;
@@ -162,30 +163,28 @@ class DinoGame {
 		}
 		else { let cactimer = cactimer - 1; }
 
-		// TODO: check if space is empty before attempting to move
 		let cactindex = numCact - 1;
 
 		while (~(cactindex < 0)) {
 			let currentCact = cactarray[cactindex];
+			// checks if there is a cactus at the current position
 			if (~(currentCact = false)) {
 				do currentCact.moveLeft();
+				// checks if the cactus is touching the dino
 				if (currentCact.checkTouch()) {
-					if (dino.getLocation() = 7073) {
+					if ((dino.getLocation() = 7073) | (dino.getLocation() = 6817) | (dino.getLocation() = 6561)) {
 						let exit = true;
 					}
 				}
+				// checks if the cactus is touching the edge of the screen
 				if (currentCact.checkEdge() = true) {
 					do currentCact.dispose();
 					let currentCact = false;
 					let numCact = numCact - 1;
 				}
 			}
-
-
-			// do cactarray[cactindex].moveLeft();
 			let cactindex = cactindex - 1;
 		}
-
 		return;
 	}
 	

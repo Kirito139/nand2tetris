@@ -72,7 +72,7 @@ class Dino {
 		return;
 	}
 	
-	/** moves dino up by 2 pixels */
+	/** moves dino up by 8 pixels */
 	method void moveUp() {
 		// if (y > 7) {
 			do erase();
@@ -86,7 +86,7 @@ class Dino {
 		return location;
 	}
 	
-	/** moves dino down by 2 pixels */
+	/** moves dino down by 8 pixels */
 	method void moveDown() {
 		// if ((y + 16) < 254) {
 			do erase();
