@@ -1,0 +1,107 @@
+/** Implements a graphical dino. */
+class Dino {
+
+	field int x, y; // screen location of the dino's top-left corner
+	
+	field int airtime; // how long the dino has been in the air
+	field int memAddress;
+	field int location;
+
+	/** Constructs a new dino with a given location **/
+	constructor Dino new(int dinox, int dinoy) {
+		// let x = dinox;
+		// let y = dinoy;
+		let location = 7073;
+		let memAddress = 16384 + location;
+		let airtime = 0;
+		do draw();
+		return this;
+	}
+
+	/** disposes this dino */
+	method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+	}
+
+	/** draws the dino on the screen */
+	method void draw() {
+		// do Screen.setColor(true);
+		// do Screen.drawRectangle(x, y, x+16, y+16);
+		let memAddress = 16384+location;
+		do Memory.poke(memAddress+0, 32512);
+		do Memory.poke(memAddress+32, -640);
+		do Memory.poke(memAddress+64, -128);
+		do Memory.poke(memAddress+96, -128);
+		do Memory.poke(memAddress+128, 8064);
+		do Memory.poke(memAddress+160, 32641);
+		do Memory.poke(memAddress+192, 4035);
+		do Memory.poke(memAddress+224, 4071);
+		do Memory.poke(memAddress+256, 16383);
+		do Memory.poke(memAddress+288, 12287);
+		do Memory.poke(memAddress+320, 4094);
+		do Memory.poke(memAddress+352, 2044);
+		do Memory.poke(memAddress+384, 1016);
+		do Memory.poke(memAddress+416, 432);
+		do Memory.poke(memAddress+448, 272);
+		do Memory.poke(memAddress+480, 816);
+		return;
+	}
+
+	/** erases the dino from the screen */
+	method void erase() {
+		let memAddress = 16384+location;
+		do Memory.poke(memAddress+0, 0);
+		do Memory.poke(memAddress+32, 0);
+		do Memory.poke(memAddress+64, 0);
+		do Memory.poke(memAddress+96, 0);
+		do Memory.poke(memAddress+128, 0);
+		do Memory.poke(memAddress+160, 0);
+		do Memory.poke(memAddress+192, 0);
+		do Memory.poke(memAddress+224, 0);
+		do Memory.poke(memAddress+256, 0);
+		do Memory.poke(memAddress+288, 0);
+		do Memory.poke(memAddress+320, 0);
+		do Memory.poke(memAddress+352, 0);
+		do Memory.poke(memAddress+384, 0);
+		do Memory.poke(memAddress+416, 0);
+		do Memory.poke(memAddress+448, 0);
+		do Memory.poke(memAddress+480, 0);
+		// do Screen.setColor(false);
+		// do Screen.drawRectangle(x, y, x+16, y+16);
+		return;
+	}
+	
+	/** moves dino up by 2 pixels */
+	method void moveUp() {
+		// if (y > 7) {
+			do erase();
+			let location = location - 256;
+			do draw();
+		// }
+		return;
+	}
+
+	method int getLocation() {
+		return location;
+	}
+	
+	/** moves dino down by 2 pixels */
+	method void moveDown() {
+		// if ((y + 16) < 254) {
+			do erase();
+			let location = location + 256;
+			do draw();
+		// }
+		return;
+	}
+
+	/** handles all dino movement */
+	// method void move() {
+	// 	if (airtime < 9) { do dino.moveUp(); }
+	// 	else { do dino.moveDown(); }
+	// 	if (airtime = 18) { let airtime = 0; }
+	// 	else { let airtime = airtime + 1; }
+	// 	return;
+	// }
+}

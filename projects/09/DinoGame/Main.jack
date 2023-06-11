@@ -1,0 +1,10 @@
+class Main {
+	function void main() {
+		var DinoGame game;
+		do DinoGame.newInstance();
+		let game = DinoGame.getInstance();
+		do game.run();
+		do game.dispose();
+		return;
+	}
+}
