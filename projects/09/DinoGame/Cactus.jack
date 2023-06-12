@@ -1,19 +1,12 @@
 /** implements a graphical cactus */
 class Cactus {
 	
-	// field int x, y; // screen location of the cactus' top-left corner
 	field int location; // screen location of the cactus' top-left corner
-	field int type; // which cactus to draw. adds some variety.
-	field int cactDiv; // allows moving cactus left by smaller increments
 	field int memAddress;
 	
 	/** Constructs a new cactus with a given location and type */
-	constructor Cactus new(int cactustype) {
-		// let x = cactusx;
-		// let y = cactusy;
-		let location = 7103;	// cactLocation;
-		let cactDiv = 1;
-		let type = cactustype;
+	constructor Cactus new() {
+		let location = 7103;
 		do draw();
 		return this;
 	}
@@ -24,77 +17,33 @@ class Cactus {
 		do Memory.deAlloc(this);
 		return;
 	}
-	// TODO: change from xy system to location system, divide all column
-	// numbers by two to move cactus one pixel left, use two 16x16 block
-	// to achieve animation. also detect edge of screen and delete cactus
+	// TODO: divide all column numbers by two to move cactus one pixel
+	// left, use two 16x16 block to achieve animation.
 
-	/** draws a cactus on the screen */
+	/** draws a black cactus on the screen */
 	method void draw() {
 		// method void cactusOne(int location) {
-		if (type = 2) {
-			let memAddress = 16384+location;
-			do Memory.poke(memAddress+0, 32/cactDiv);
-			do Memory.poke(memAddress+32, 112/cactDiv);
-			do Memory.poke(memAddress+64, 112/cactDiv);
-			do Memory.poke(memAddress+96, 624/cactDiv);
-			do Memory.poke(memAddress+128, 1648/cactDiv);
-			do Memory.poke(memAddress+160, 9840/cactDiv);
-			do Memory.poke(memAddress+192, 11890/cactDiv);
-			do Memory.poke(memAddress+224, -20877/cactDiv);
-			do Memory.poke(memAddress+256, -20877/cactDiv);
-			do Memory.poke(memAddress+288, -18829/cactDiv);
-			do Memory.poke(memAddress+320, -22541/cactDiv);
-			do Memory.poke(memAddress+352, 25599/cactDiv);
-			do Memory.poke(memAddress+384, 8446/cactDiv);
-			do Memory.poke(memAddress+416, 8312/cactDiv);
-			do Memory.poke(memAddress+448, 8304/cactDiv);
-			do Memory.poke(memAddress+480, 8304/cactDiv);
-		}
-		else {
-			if (type = 1) {
-				let memAddress = 16384+location;
-				do Memory.poke(memAddress+0, 384/cactDiv);
-				do Memory.poke(memAddress+32, 962/cactDiv);
-				do Memory.poke(memAddress+64, 17351/cactDiv);
-				do Memory.poke(memAddress+96, -7225/cactDiv);
-				do Memory.poke(memAddress+128, -7225/cactDiv);
-				do Memory.poke(memAddress+160, -7225/cactDiv);
-				do Memory.poke(memAddress+192, -7225/cactDiv);
-				do Memory.poke(memAddress+224, -1/cactDiv);
-				do Memory.poke(memAddress+256, 32766/cactDiv);
-				do Memory.poke(memAddress+288, 16380/cactDiv);
-				do Memory.poke(memAddress+320, 960/cactDiv);
-				do Memory.poke(memAddress+352, 960/cactDiv);
-				do Memory.poke(memAddress+384, 960/cactDiv);
-				do Memory.poke(memAddress+416, 960/cactDiv);
-				do Memory.poke(memAddress+448, 960/cactDiv);
-				do Memory.poke(memAddress+480, 960/cactDiv);
-			/*	
-				do Memory.poke(memAddress+0, 386/cactDiv);
-				do Memory.poke(memAddress+32, 17351/cactDiv);
-				do Memory.poke(memAddress+64, -7225/cactDiv);
-				do Memory.poke(memAddress+96, -7225/cactDiv);
-				do Memory.poke(memAddress+128, -7225/cactDiv);
-				do Memory.poke(memAddress+160, -7225/cactDiv);
-				do Memory.poke(memAddress+192, -7217/cactDiv);
-				do Memory.poke(memAddress+224, -7170/cactDiv);
-				do Memory.poke(memAddress+256, -3076/cactDiv);
-				do Memory.poke(memAddress+288, -16/cactDiv);
-				do Memory.poke(memAddress+320, 32704/cactDiv);
-				do Memory.poke(memAddress+352, 8128/cactDiv);
-				do Memory.poke(memAddress+384, 4032/cactDiv);
-				do Memory.poke(memAddress+416, 960/cactDiv);
-				do Memory.poke(memAddress+448, 960/cactDiv);
-				do Memory.poke(memAddress+480, 960/cactDiv);
-			*/
-			}
-		}
-		// do Screen.setColor(true);
-		// do Screen.drawRectangle(x, y, x + 16, y + 16);
+		let memAddress = 16384+location;
+		do Memory.poke(memAddress+0, 384);
+		do Memory.poke(memAddress+32, 962);
+		do Memory.poke(memAddress+64, 17351);
+		do Memory.poke(memAddress+96, -7225);
+		do Memory.poke(memAddress+128, -7225);
+		do Memory.poke(memAddress+160, -7225);
+		do Memory.poke(memAddress+192, -7225);
+		do Memory.poke(memAddress+224, -1);
+		do Memory.poke(memAddress+256, 32766);
+		do Memory.poke(memAddress+288, 16380);
+		do Memory.poke(memAddress+320, 960);
+		do Memory.poke(memAddress+352, 960);
+		do Memory.poke(memAddress+384, 960);
+		do Memory.poke(memAddress+416, 960);
+		do Memory.poke(memAddress+448, 960);
+		do Memory.poke(memAddress+480, 960);
 		return;
 	}
 	
-	/** erases a cactus on the screen */
+	/** draws a white 16x16 block on the screen */
 	method void erase() {
 		let memAddress = 16384+location;
 		do Memory.poke(memAddress+0, 0);
@@ -114,7 +63,6 @@ class Cactus {
 		do Memory.poke(memAddress+448, 0);
 		do Memory.poke(memAddress+480, 0);
 		do Screen.setColor(false);
-		// do Screen.drawRectangle(x, y, x + 16, y + 16);
 		return;
 	}
 	
@@ -127,10 +75,14 @@ class Cactus {
 		}
 		return;
 	}
+
+	/** checks if cactus touching left edge of screen */
 	method boolean checkEdge() {
 		if (location < 7073) { return true; }
 		return false;
 	}
+
+	/** checks if cactus is in the same column as the dino on the screen */
 	method boolean checkTouch() {
 		if (location = 7073) { return true; }
 		return false;

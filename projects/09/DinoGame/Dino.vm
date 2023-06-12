@@ -1,0 +1,273 @@
+function Dino.new 0
+push constant 5
+call Memory.alloc 1
+pop pointer 0
+push constant 7073
+pop this 4
+push constant 16384
+push this 4
+add
+pop this 3
+push constant 0
+pop this 2
+push pointer 0
+call Dino.draw 1
+pop temp 0
+push pointer 0
+return
+function Dino.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function Dino.draw 0
+push argument 0
+pop pointer 0
+push constant 16384
+push this 4
+add
+pop this 3
+push this 3
+push constant 0
+add
+push constant 32512
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 32
+add
+push constant 640
+neg
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 64
+add
+push constant 128
+neg
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 96
+add
+push constant 128
+neg
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 128
+add
+push constant 8064
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 160
+add
+push constant 32641
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 192
+add
+push constant 4035
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 224
+add
+push constant 4071
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 256
+add
+push constant 16383
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 288
+add
+push constant 12287
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 320
+add
+push constant 4094
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 352
+add
+push constant 2044
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 384
+add
+push constant 1016
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 416
+add
+push constant 432
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 448
+add
+push constant 272
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 480
+add
+push constant 816
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Dino.erase 0
+push argument 0
+pop pointer 0
+push constant 16384
+push this 4
+add
+pop this 3
+push this 3
+push constant 0
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 32
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 64
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 96
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 128
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 160
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 192
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 224
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 256
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 288
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 320
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 352
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 384
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 416
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 448
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push this 3
+push constant 480
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Dino.moveUp 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Dino.erase 1
+pop temp 0
+push this 4
+push constant 256
+sub
+pop this 4
+push pointer 0
+call Dino.draw 1
+pop temp 0
+push constant 0
+return
+function Dino.getLocation 0
+push argument 0
+pop pointer 0
+push this 4
+return
+function Dino.moveDown 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Dino.erase 1
+pop temp 0
+push this 4
+push constant 256
+add
+pop this 4
+push pointer 0
+call Dino.draw 1
+pop temp 0
+push constant 0
+return

@@ -1,0 +1,13 @@
+function Main.main 1
+call DinoGame.newInstance 0
+pop temp 0
+call DinoGame.getInstance 0
+pop local 0
+push local 0
+call DinoGame.run 1
+pop temp 0
+push local 0
+call DinoGame.dispose 1
+pop temp 0
+push constant 0
+return
