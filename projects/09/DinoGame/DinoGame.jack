@@ -21,15 +21,13 @@ class DinoGame {
 	field int cactimer1;
 	field int cactimer2;
 	field int cactimer3;
-	field int cactimer4;
-	field int cactimer5;
 
 	/** Constructs a new Dino game */
 	constructor DinoGame new() {
 		do Screen.clearScreen();
 		do Output.moveCursor(0, 58);
 		do Output.printString("00000");
-		let cactarray = Array.new(5);
+		let cactarray = Array.new(3);
 		let dino = Dino.new(10, 220);
 		let airtime = 0;
 		let nextCact = 0;
@@ -42,8 +40,7 @@ class DinoGame {
 		let cactimer1 = 50;
 		let cactimer2 = 60;
 		let cactimer3 = 70;
-		let cactimer4 = 80;
-		let cactimer5 = 90;
+		do Utils.initRandomSeed(17394);
 		return this;
 	}
 
@@ -118,73 +115,61 @@ class DinoGame {
 
 	/** moves, adds, and removes cacti */
 	method void updateCacti() {
+		var int movecounter;
+		let movecounter = 0;
 		/* makes sure there are up to five cacti at a time with a minium of 30
 		 * calls of this function in between. whether or not a cactus is actually
 		 * created is supposed to be relatively random
 		 */
 		// TODO: make cacti more random
-		if ((cactarray[0] = false) & (cactimer1 = 0)) {
-			let nextCact = 0;
-			let cactimer = 30;
-			let cactimer1 = 50;
-		}
-		else {
-			if ((cactarray[1] = false) & (cactimer2 = 0)) {
-				let nextCact = 1;
-				let cactimer = 30;
-				let cactimer2 = 60;
+		// first iterates thru the array to see if there are any empty cacti slots
+
+		let cactindex = 2;
+		
+		while (~(cactindex < 0)) {
+			if (cactarray[cactindex] = false) {
+				let nextCact = cactindex;
 			}
-			else {
-				if ((cactarray[2] = false) & (cactimer3 = 0)) {
-					let nextCact = 2;
-					let cactimer = 30;
-					let cactimer3 = 70;
-				}
-				else {
-					if ((cactarray[3] = false) & (cactimer4 = 0)) {
-						let nextCact = 3;
-						let cactimer = 30;
-						let cactimer4 = 80;
-					}
-					else {
-						if ((cactarray[4] = false) & (cactimer5 = 0)) {
-							let nextCact = 4;
-							let cactimer = 30;
-							let cactimer5 = 90;
-						}
-					}
-				}
-			}
+			let cactindex = cactindex - 1;
 		}
-		if (/*(rand(3)) & */(numCact < 5) & (cactimer = 0)) {
+		// the first 30 times, this will be skipped because cactimer is more than 0
+		// if there are less than five cacti and the cactimer is 0, creates a new cactus,
+		// adds one to numcact to reflect the number of cacti, and resets the cactimer
+		if ((numCact < 5) & (cactimer = 0)) {
 			let cactarray[nextCact] = Cactus.new(1);
 			let numCact = numCact + 1;
-			let cactimer = 30;
+			while (cactimer < 10) {
+				let cactimer = Utils.random(50);
+			}
 		}
+		// otherwise, decrements the cactimer
 		else { let cactimer = cactimer - 1; }
 
-		let cactindex = numCact - 1;
+		// used as the index for the following while loop. set to the number of cacti minus one since
+		// machines count starting from 0
+		let cactindex = 2;
 
 		while (~(cactindex < 0)) {
 			let currentCact = cactarray[cactindex];
 			// checks if there is a cactus at the current position
-			if (~(currentCact = false)) {
+			if (currentCact) {
 				do currentCact.moveLeft();
+				let movecounter = movecounter + 1;
 				// checks if the cactus is touching the dino
-				if (currentCact.checkTouch()) {
-					if ((dino.getLocation() = 7073) | (dino.getLocation() = 6817) | (dino.getLocation() = 6561)) {
+				if ((currentCact.checkTouch()) & (dino.getLocation() > 6560)) {
 						let exit = true;
-					}
 				}
 				// checks if the cactus is touching the edge of the screen
 				if (currentCact.checkEdge() = true) {
 					do currentCact.dispose();
-					let currentCact = false;
+					let cactarray[cactindex] = false;
 					let numCact = numCact - 1;
 				}
 			}
 			let cactindex = cactindex - 1;
 		}
+		do Output.moveCursor(0,0);
+		do Output.printInt(movecounter);
 		return;
 	}
 	
