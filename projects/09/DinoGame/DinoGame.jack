@@ -21,6 +21,10 @@ class DinoGame {
 	field int cactimer1;
 	field int cactimer2;
 	field int cactimer3;
+	static int _lastNum;
+	static int PSEUDA_RAND_MULTIPLIER;
+	static int PSEUDA_RAND_ADDER;
+	static int MAX_DIST;
 
 	/** Constructs a new Dino game */
 	constructor DinoGame new() {
@@ -40,7 +44,10 @@ class DinoGame {
 		let cactimer1 = 50;
 		let cactimer2 = 60;
 		let cactimer3 = 70;
-		do Utils.initRandomSeed(17394);
+		let _lastNum = 17394;
+		let PSEUDA_RAND_MULTIPLIER = 91;
+		let PSEUDA_RAND_ADDER = 1;
+		let MAX_DIST = 16354;
 		return this;
 	}
 
@@ -121,7 +128,6 @@ class DinoGame {
 		 * calls of this function in between. whether or not a cactus is actually
 		 * created is supposed to be relatively random
 		 */
-		// TODO: make cacti more random
 		// first iterates thru the array to see if there are any empty cacti slots
 
 		let cactindex = 2;
@@ -139,7 +145,7 @@ class DinoGame {
 			let cactarray[nextCact] = Cactus.new(1);
 			let numCact = numCact + 1;
 			while (cactimer < 10) {
-				let cactimer = Utils.random(50);
+				let cactimer = DinoGame.random();
 			}
 		}
 		// otherwise, decrements the cactimer
@@ -204,13 +210,11 @@ class DinoGame {
 		return;
 	}
 
-	method boolean rand(int num/*, int address*/) {
-		var boolean randout;
-		var int memcontent;
-		var boolean divClean;
-		// let memcontent = Memory.peek(address); // arbitrary memory location
-		let randout = DinoGame.checkCleanDiv(
-		airtime * score + 595 * Math.sqrt(score) * 3, num);
-		return randout;
+	function int random() {
+		var int res;
+		let res = Utils.modulo(_lastNum, 30);
+		let _lastNum = (_lastNum * PSEUDA_RAND_MULTIPLIER) + PSEUDA_RAND_ADDER;
+		let _lastNum = Utils.moduloPower2(_lastNum, 1024);
+		return res + 10;
 	}
 }
